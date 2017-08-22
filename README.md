@@ -1,6 +1,6 @@
  # Material-Dashboard-Cards-as-HTML-or-for-Apex
 
-![Screenshot](https://github.com/RonnyWeiss/Material-Dashboard-Cards-as-HTML-or-for-Apex/blob/master/screenshot.png?raw=true)
+![Screenshot](https://github.com/RonnyWeiss/Material-Dashboard-Cards-as-HTML-or-for-Apex/blob/master/screenshot.gif?raw=true)
 
 This project is a Region Plug-in for Oracle Apex that let's you easily create some nice, responsive Material Design Cards. These Cards can be shown in a small view with just an icon or in a larger view with Chartist Charts. You can also use the cards without Apex. Just download all files and start index.html.
 
