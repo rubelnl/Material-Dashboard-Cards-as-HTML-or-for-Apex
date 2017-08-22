@@ -1,6 +1,6 @@
 var materialCards = (function () {
     "use strict";
-    var scriptVersion = "1.0";
+    var scriptVersion = "1.1";
     return {
         /* Initialize function for cards */
         initialize: function (
@@ -11,7 +11,7 @@ var materialCards = (function () {
             };
             var configJSON = {};
 
-            /* get parent and make min height to show loader */
+            /* get parent */
             var parent = $("#" + parentID);
 
             if (parent.length > 0) {
@@ -468,18 +468,18 @@ var materialCards = (function () {
 
                     /* draw chart with type that is set */
                     switch (cardData.CARD_TYPE.toLowerCase()) {
-                    case "chart-line":
-                        chartIst = new Chartist.Line("#" + chartID, chartData, standardChartConfig);
-                        break;
-                    case "chart-bar":
-                        chartIst = new Chartist.Bar("#" + chartID, chartData, standardChartConfig);
-                        break;
-                    case "chart-pie":
-                        standardChartConfig.chartPadding = {};
-                        chartIst = new Chartist.Pie("#" + chartID, chartData, standardChartConfig);
-                        break;
-                    default:
-                        console.log("No valid Chart type");
+                        case "chart-line":
+                            chartIst = new Chartist.Line("#" + chartID, chartData, standardChartConfig);
+                            break;
+                        case "chart-bar":
+                            chartIst = new Chartist.Bar("#" + chartID, chartData, standardChartConfig);
+                            break;
+                        case "chart-pie":
+                            standardChartConfig.chartPadding = {};
+                            chartIst = new Chartist.Pie("#" + chartID, chartData, standardChartConfig);
+                            break;
+                        default:
+                            console.log("No valid Chart type");
                     }
 
                     /* style chart */
@@ -488,9 +488,16 @@ var materialCards = (function () {
                     chartIst.on('draw', function (context) {
 
                         if (context.type === 'bar' || context.type === 'line' || context.type === 'point') {
-                            context.element.attr({
-                                style: 'stroke:  ' + iconColor
-                            });
+
+                            if (standardChartConfig.strokeWidth) {
+                                context.element.attr({
+                                    style: 'stroke:  ' + iconColor + '; stroke-width:' + standardChartConfig.strokeWidth + 'px;'
+                                });
+                            } else {
+                                context.element.attr({
+                                    style: 'stroke:  ' + iconColor
+                                });
+                            }
                         }
 
                         if (context.type === 'slice' || context.type === 'area') {
@@ -499,7 +506,21 @@ var materialCards = (function () {
                                 style: 'fill: ' + iconColor + '; fill-opacity: ' + (((context.index) % 10) + 2) / 10
                             });
                         }
+
+                        if (standardChartConfig.donut === true) {
+
+                            if (standardChartConfig.sliceWidth) {
+                                $(chart).find(".ct-slice-donut").css("stroke-width", standardChartConfig.sliceWidth.toString() + "px");
+                            }
+                            context.element.attr({
+                                style: 'stroke-opacity: ' + (((-context.index) % 10) + 10) / 10 + '; stroke:  ' + iconColor + ';'
+                            });
+                            $(chart).find(".ct-label").css("stroke", 'initial');
+                            $(chart).find(".ct-label").css("fill", iconColor);
+                        }
+
                         $(chart).find(".ct-slice-pie").attr("stroke", iconColor);
+                        $(chart).find(".ct-slice-donut").attr("stroke", iconColor);
                         $(chart).find(".ct-label").css("color", iconColor);
                         $(chart).find(".ct-grid").css("stroke", iconColor);
                         $(chart).find(".ct-grid").css("opacity", ".4");
