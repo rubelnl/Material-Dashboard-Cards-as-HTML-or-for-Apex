@@ -119,7 +119,11 @@ wwv_flow_api.create_plugin(
 '       DECODE(ROWNUM, 1, ''fa-globe'', 2, ''fa-gear'', ''fa-user'') AS CARD_ICON,',
 '       /* defines the color of the icon e.g white or #ffffff */',
 '       NULL AS CARD_ICON_COLOR,',
-'       /* defines the style of the header this could be just a background or maybe a nice gradient */',
+'       /* defines the style of the header this could be just a background or maybe a nice gradient ',
+'          e.g. background: linear-gradient(60deg, hsl(115, 55%, 60%), hsl(115, 50%, 60%));',
+'               box-shadow: 0 12px 20px -10px rgba(230, 230, 230, 0.28), 0 4px 20px 0px ',
+'               rgba(0, 0, 0, 0.12), 0 7px 8px -5px rgba(230, 230, 230, 0.2);',
+'       */',
 '       NULL AS CARD_HEADER_STYLE,',
 '       /* defines the title that should be shown */',
 '       ''Material Card'' AS CARD_TITLE,',
@@ -197,7 +201,7 @@ wwv_flow_api.create_plugin(
 ,p_help_text=>'This Plug-in is used to draw some nice material design cards in apex. Just add this region plug-in on your page and look into the help tab to learn about what you have to todo in sql statement. Normally when you add this Plug-in to your page the Defa'
 ||'ult SQL Statement will be set automatically to your Region SQL Source so you can have a look at your finished page to see that everything works. The Cards can just show an icon or some nice responsive charts. The Cards itself are also responsive with'
 ||' tehir own responsive grid so you can use them also in a not responsive theme. For licenses please take a look at the comments.'
-,p_version_identifier=>'1.1'
+,p_version_identifier=>'1.1.1'
 ,p_about_url=>'https://github.com/RonnyWeiss/Material-Dashboard-Cards-as-HTML-or-for-Apex'
 ,p_plugin_comment=>wwv_flow_utilities.join(wwv_flow_t_varchar2(
 'Licenses:',

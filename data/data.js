@@ -3,7 +3,7 @@ var dataJSON = {
         "CARD_TYPE": "icon",
         "CARD_ICON": "fa-bell-o",
         "CARD_ICON_COLOR": null,
-        "CARD_HEADER_STYLE": null,
+        "CARD_HEADER_STYLE": 'background: linear-gradient(60deg, hsl(0, 55%, 60%), hsl(0, 50%, 60%));box-shadow: 0 12px 20px -10px rgba(230, 230, 230, 0.28), 0 4px 20px 0px rgba(0, 0, 0, 0.12), 0 7px 8px -5px rgba(230, 230, 230, 0.2);',
         "CARD_TITLE": "Card Title",
         "CARD_VALUE": "100 %",
         "CARD_FOOTER": '<i class="fa fa-external-link"></i> This is a Card Sub Text',
