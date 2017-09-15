@@ -73,7 +73,8 @@ var dataJSON = {
         "CARD_LINK": "https://www.valuetech.de/",
         "CARD_CHART_DATA": {
             labels: ['Mo', 'Tue', 'Wed', 'Th', 'Fr'],
-            series: [12, 9, 7, 8, 5]
+            series: [12, 9, 7, 8, 5] //,
+                //colors: ["rgba(255, 255, 255, 0.4)", "rgba(255, 255, 255, 0.6)", "rgba(255, 255, 255, 0.7)", "rgba(255, 255, 255, 0.9)", "rgba(255, 255, 255, 1)"]
         },
         "CARD_CHART_CONFIG": {}
     }]

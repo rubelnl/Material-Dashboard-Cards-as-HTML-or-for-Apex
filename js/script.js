@@ -1,6 +1,6 @@
 var materialCards = (function () {
     "use strict";
-    var scriptVersion = "1.1";
+    var scriptVersion = "1.2";
     return {
         /* Initialize function for cards */
         initialize: function (
@@ -468,25 +468,39 @@ var materialCards = (function () {
 
                     /* draw chart with type that is set */
                     switch (cardData.CARD_TYPE.toLowerCase()) {
-                        case "chart-line":
-                            chartIst = new Chartist.Line("#" + chartID, chartData, standardChartConfig);
-                            break;
-                        case "chart-bar":
-                            chartIst = new Chartist.Bar("#" + chartID, chartData, standardChartConfig);
-                            break;
-                        case "chart-pie":
-                            standardChartConfig.chartPadding = {};
-                            chartIst = new Chartist.Pie("#" + chartID, chartData, standardChartConfig);
-                            break;
-                        default:
-                            console.log("No valid Chart type");
+                    case "chart-line":
+                        chartIst = new Chartist.Line("#" + chartID, chartData, standardChartConfig);
+                        break;
+                    case "chart-bar":
+                        chartIst = new Chartist.Bar("#" + chartID, chartData, standardChartConfig);
+                        break;
+                    case "chart-pie":
+                        standardChartConfig.chartPadding = {};
+                        chartIst = new Chartist.Pie("#" + chartID, chartData, standardChartConfig);
+                        break;
+                    default:
+                        console.log("No valid Chart type");
                     }
 
                     /* style chart */
                     var iconColor = (cardData.CARD_ICON_COLOR != undefined && cardData.CARD_ICON_COLOR.length > 0) ? cardData.CARD_ICON_COLOR : 'white';
 
                     chartIst.on('draw', function (context) {
+                        var cardChartData = {};
+                        if (cardData.CARD_CHART_DATA && typeof cardData.CARD_CHART_DATA == 'string') {
+                            try {
+                                cardChartData = JSON.parse(cardData.CARD_CHART_DATA);
 
+                            } catch (e) {
+                                console.log("Error while try to parse CARD_CHART_CONFIG: " + e + chartConfig);
+                            }
+                        } else {
+                            cardChartData = cardData.CARD_CHART_DATA;
+                        }
+
+                        if (cardChartData.colors) {
+                            iconColor = cardChartData.colors[context.index] || cardChartData.colors[0];
+                        }
                         if (context.type === 'bar' || context.type === 'line' || context.type === 'point') {
 
                             if (standardChartConfig.strokeWidth) {
@@ -500,13 +514,20 @@ var materialCards = (function () {
                             }
                         }
 
-                        if (context.type === 'slice' || context.type === 'area') {
+                        if (context.type === 'slice') {
+                            context.element.attr({
+                                //style: 'fill: hsl(' + context.index * 20 % 350 + ', 50%, 60%)'
+                                style: 'fill: ' + iconColor + '; fill-opacity: ' + ((cardChartData.colors) ? 0.6 : (((context.index) % 10) + 2) / 10)
+                            });
+                        }
+
+                        if (context.type === 'area') {
                             context.element.attr({
                                 //style: 'fill: hsl(' + context.index * 20 % 350 + ', 50%, 60%)'
                                 style: 'fill: ' + iconColor + '; fill-opacity: ' + (((context.index) % 10) + 2) / 10
                             });
-                        }
 
+                        }
                         if (standardChartConfig.donut === true) {
 
                             if (standardChartConfig.sliceWidth) {
@@ -518,11 +539,10 @@ var materialCards = (function () {
                             $(chart).find(".ct-label").css("stroke", 'initial');
                             $(chart).find(".ct-label").css("fill", iconColor);
                         }
-
-                        $(chart).find(".ct-slice-pie").attr("stroke", iconColor);
+                        $(chart).find(".ct-slice-pie").attr("stroke", ((cardChartData.colors) ? "rgba(0,0,0,0)" : iconColor));
                         $(chart).find(".ct-slice-donut").attr("stroke", iconColor);
-                        $(chart).find(".ct-label").css("color", iconColor);
-                        $(chart).find(".ct-grid").css("stroke", iconColor);
+                        $(chart).find(".ct-label").css("color", ((cardChartData.colors) ? "white" : iconColor));
+                        $(chart).find(".ct-grid").css("stroke", ((cardChartData.colors) ? "white" : iconColor));
                         $(chart).find(".ct-grid").css("opacity", ".4");
                     });
                 }
