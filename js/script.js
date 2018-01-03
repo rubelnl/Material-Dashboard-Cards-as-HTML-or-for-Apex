@@ -71,17 +71,6 @@ var materialCards = (function () {
 
             /***********************************************************************
              **
-             ** Used to create a jquery selector list from items2submit list
-             **
-             ***********************************************************************/
-            function getjQuerySelectorsFromList(list) {
-
-                var selectorList = "#" + list.replace(/,/g, ",#");
-                return selectorList;
-            }
-
-            /***********************************************************************
-             **
              ** Used to add a loading icon to the tiles
              **
              ***********************************************************************/
@@ -171,7 +160,7 @@ var materialCards = (function () {
                 if (ajaxID) {
                     addLoader();
 
-                    var submitItems = getjQuerySelectorsFromList(items2Submit);
+                    var submitItems = items2Submit;
 
                     apex.server.plugin(
                         ajaxID, {
