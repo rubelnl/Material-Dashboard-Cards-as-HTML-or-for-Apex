@@ -1,6 +1,6 @@
 var materialCards = (function () {
     "use strict";
-    var scriptVersion = "1.2";
+    var scriptVersion = "1.2.1";
     return {
         /* Initialize function for cards */
         initialize: function (
@@ -10,7 +10,6 @@ var materialCards = (function () {
                 "refresh": 0
             };
             var configJSON = {};
-
             /* get parent */
             var parent = $("#" + parentID);
 
@@ -68,6 +67,17 @@ var materialCards = (function () {
 
             } else {
                 console.log("Can't find parentID: " + parentID);
+            }
+
+            /***********************************************************************
+             **
+             ** Used to create a jquery selector list from items2submit list
+             **
+             ***********************************************************************/
+            function getjQuerySelectorsFromList(list) {
+
+                var selectorList = "#" + list.replace(/,/g, ",#");
+                return selectorList;
             }
 
             /***********************************************************************
@@ -160,9 +170,12 @@ var materialCards = (function () {
             function getData() {
                 if (ajaxID) {
                     addLoader();
+
+                    var submitItems = getjQuerySelectorsFromList(items2Submit);
+
                     apex.server.plugin(
                         ajaxID, {
-                            pageItems: items2Submit
+                            pageItems: submitItems
                         }, {
                             success: drawCardsRegion,
                             error: function (d) {
@@ -534,10 +547,10 @@ var materialCards = (function () {
                                 $(chart).find(".ct-slice-donut").css("stroke-width", standardChartConfig.sliceWidth.toString() + "px");
                             }
                             context.element.attr({
-                                style: 'stroke-opacity: ' + (((-context.index) % 10) + 10) / 10 + '; stroke:  ' + iconColor + ';'
+                                style: 'stroke-opacity: ' + (((-context.index) % 10) + 10) / 10 + '; stroke:  ' + iconColor
                             });
                             $(chart).find(".ct-label").css("stroke", 'initial');
-                            $(chart).find(".ct-label").css("fill", iconColor);
+                            $(chart).find(".ct-label").css("fill", ((cardChartData.colors) ? "white" : iconColor));
                         }
                         $(chart).find(".ct-slice-pie").attr("stroke", ((cardChartData.colors) ? "rgba(0,0,0,0)" : iconColor));
                         $(chart).find(".ct-slice-donut").attr("stroke", iconColor);
