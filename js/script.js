@@ -1,44 +1,99 @@
 var materialCards = (function () {
     "use strict";
-    var scriptVersion = "1.2.1";
+    var scriptVersion = "1.2.2";
+    var util = {
+        version: "1.0",
+        escapeHTML: function (str) {
+            if (str && str.length > 0) {
+                try {
+                    return apex.util.escapeHTML(str.toString());
+                } catch (e) {
+                    return str
+                        .toString()
+                        .replace(/&/g, "&amp;")
+                        .replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;")
+                        .replace(/"/g, "&quot;")
+                        .replace(/'/g, "&#x27;")
+                        .replace(/\//g, "&#x2F;");
+                }
+            }
+        },
+        loader: {
+            start: function (id) {
+                try {
+                    apex.util.showSpinner($(id));
+                } catch (e) {
+                    /* define loader */
+                    var faLoader = $("<span></span>");
+                    faLoader.attr("id", "loader" + id);
+                    faLoader.addClass("ct-loader fa-stack fa-3x");
+
+                    /* define circle for loader */
+                    var faCircle = $("<i></i>");
+                    faCircle.addClass("fa fa-circle fa-stack-2x");
+                    faCircle.css("color", "rgba(121,121,121,0.6)");
+
+                    /* define refresh icon with animation */
+                    var faRefresh = $("<i></i>");
+                    faRefresh.addClass("fa fa-refresh fa-spin fa-inverse fa-stack-1x");
+                    faRefresh.css("animation-duration", "1.8s");
+
+                    /* append loader */
+                    faLoader.append(faCircle);
+                    faLoader.append(faRefresh);
+                    $(id).append(faLoader);
+                }
+            },
+            stop: function (id) {
+                $(id + " > .u-Processing").remove();
+            }
+        },
+        jsonSaveExtend: function (srcConfig, targetConfig) {
+            var finalConfig = {};
+            /* try to parse config json when string or just set */
+            if (typeof targetConfig === 'string') {
+                try {
+                    targetConfig = JSON.parse(targetConfig);
+                } catch (e) {
+                    console.log("Error while try to parse udConfigJSON. Please check your Config JSON. Standard Config will be used.");
+                    console.log(e);
+                    console.log(targetConfig);
+                }
+            } else {
+                finalConfig = targetConfig;
+            }
+            /* try to merge with standard if any attribute is missing */
+            try {
+                finalConfig = $.extend(true, srcConfig, targetConfig);
+            } catch (e) {
+                console.log('Error while try to merge udConfigJSON into Standard JSON if any attribute is missing. Please check your Config JSON. Standard Config will be used.');
+                console.log(e);
+                finalConfig = srcConfig;
+                console.log(finalConfig);
+            }
+            return finalConfig;
+        }
+    };
+
     return {
         /* Initialize function for cards */
         initialize: function (
-            parentID, ajaxID, noDataFoundMessage, udConfigJSON, items2Submit, bindRefreshOnId) {
+            parentID, ajaxID, noDataFoundMessage, udConfigJSON, items2Submit, bindRefreshOnId, escapeRequired) {
             var stdConfigJSON = {
                 "cardWidth": 4,
                 "refresh": 0
             };
-            var configJSON = {};
+
             /* get parent */
             var parent = $("#" + parentID);
 
             if (parent.length > 0) {
+                var configJSON = {};
+                configJSON = util.jsonSaveExtend(stdConfigJSON, udConfigJSON);
+
                 /* define container and add it to parent */
                 var container = drawContainer(parent);
-
-                /* try to parse config json when string or just set */
-                if (typeof udConfigJSON == 'string') {
-                    try {
-                        configJSON = JSON.parse(udConfigJSON);
-                    } catch (e) {
-                        console.log("Error while try to parse udConfigJSON. Please check your Config JSON. Standard Config will be used.");
-                        console.log(e);
-                        console.log(udConfigJSON);
-                        configJSON = {};
-                    }
-                } else {
-                    configJSON = udConfigJSON;
-                }
-                /* try to merge with standard if any attribute is missing */
-                try {
-                    configJSON = $.extend(true, stdConfigJSON, configJSON);
-                } catch (e) {
-                    console.log('Error while try to merge udConfigJSON into Standard JSON if any attribute is missing. Please check your Config JSON. Standard Config will be used.');
-                    console.log(e);
-                    configJSON = stdConfigJSON;
-                    console.log(configJSON);
-                }
 
                 /* get data and draw */
                 getData();
@@ -67,42 +122,6 @@ var materialCards = (function () {
 
             } else {
                 console.log("Can't find parentID: " + parentID);
-            }
-
-            /***********************************************************************
-             **
-             ** Used to add a loading icon to the tiles
-             **
-             ***********************************************************************/
-            function addLoader() {
-                try {
-                    apex.util.showSpinner(container);
-                } catch (e) {
-                    /* define loader */
-                    var faLoader = $("<span></span>");
-                    faLoader.attr("id", "loader" + parentID);
-                    faLoader.addClass("ct-loader fa-stack fa-3x");
-
-                    /* define circle for loader */
-                    var faCircle = $("<i></i>");
-                    faCircle.addClass("fa fa-circle fa-stack-2x");
-                    faCircle.css("color", "rgba(121,121,121,0.6)");
-
-                    /* define refresh icon with animation */
-                    var faRefresh = $("<i></i>");
-                    faRefresh.addClass("fa fa-refresh fa-spin fa-inverse fa-stack-1x");
-                    faRefresh.css("animation-duration", "1.8s");
-
-                    /* append loader */
-                    faLoader.append(faCircle);
-                    faLoader.append(faRefresh);
-                    container.append(faLoader);
-                }
-            }
-
-            /* don't need because container is cleared when drawed after data has been loaded*/
-            function removeLoader() {
-                /* TODO */
             }
 
             /************************************************************************
@@ -158,7 +177,7 @@ var materialCards = (function () {
              ***********************************************************************/
             function getData() {
                 if (ajaxID) {
-                    addLoader();
+                    util.loader.start(container);
 
                     var submitItems = items2Submit;
 
@@ -176,7 +195,7 @@ var materialCards = (function () {
                         });
                 } else {
                     try {
-                        addLoader();
+                        util.loader.start(container);
                         /* just wait 5 seconds to see loader */
                         setTimeout(function () {
                             drawCardsRegion(dataJSON);
@@ -198,6 +217,15 @@ var materialCards = (function () {
                 /* check data and draw cards */
                 if (cardData && cardData.length > 0) {
                     $.each(cardData, function (index, objData) {
+                        if (escapeRequired !== false) {
+                            objData.CARD_ICON = util.escapeHTML(objData.CARD_ICON);
+                            objData.CARD_ICON_COLOR = util.escapeHTML(objData.CARD_ICON_COLOR);
+                            objData.CARD_HEADER_STYLE = util.escapeHTML(objData.CARD_HEADER_STYLE);
+                            objData.CARD_TITLE = util.escapeHTML(objData.CARD_TITLE);
+                            objData.CARD_VALUE = util.escapeHTML(objData.CARD_VALUE);
+                            objData.CARD_FOOTER = util.escapeHTML(objData.CARD_FOOTER);
+                        }
+
                         if (objData.CARD_TYPE) {
                             if (objData.CARD_TYPE.toLowerCase() === "icon") {
                                 drawSmallCard(index, parent, objData, cardConfig);
@@ -208,7 +236,6 @@ var materialCards = (function () {
                             drawSmallCard(index, parent, objData, cardConfig);
                         }
                     });
-                    removeLoader();
                 }
             }
 
@@ -470,18 +497,18 @@ var materialCards = (function () {
 
                     /* draw chart with type that is set */
                     switch (cardData.CARD_TYPE.toLowerCase()) {
-                    case "chart-line":
-                        chartIst = new Chartist.Line("#" + chartID, chartData, standardChartConfig);
-                        break;
-                    case "chart-bar":
-                        chartIst = new Chartist.Bar("#" + chartID, chartData, standardChartConfig);
-                        break;
-                    case "chart-pie":
-                        standardChartConfig.chartPadding = {};
-                        chartIst = new Chartist.Pie("#" + chartID, chartData, standardChartConfig);
-                        break;
-                    default:
-                        console.log("No valid Chart type");
+                        case "chart-line":
+                            chartIst = new Chartist.Line("#" + chartID, chartData, standardChartConfig);
+                            break;
+                        case "chart-bar":
+                            chartIst = new Chartist.Bar("#" + chartID, chartData, standardChartConfig);
+                            break;
+                        case "chart-pie":
+                            standardChartConfig.chartPadding = {};
+                            chartIst = new Chartist.Pie("#" + chartID, chartData, standardChartConfig);
+                            break;
+                        default:
+                            console.log("No valid Chart type");
                     }
 
                     /* style chart */
