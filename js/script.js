@@ -1,22 +1,33 @@
 var materialCards = (function () {
     "use strict";
-    var scriptVersion = "1.2.2";
+    var scriptVersion = "1.2.3";
     var util = {
         version: "1.0",
         escapeHTML: function (str) {
-            if (str && str.length > 0) {
+            if (str === null) {
+                return null;
+            }
+            if (typeof str === "undefined") {
+                return;
+            }
+            if (typeof str === "object") {
                 try {
-                    return apex.util.escapeHTML(str.toString());
+                    str = JSON.stringify(str);
                 } catch (e) {
-                    return str
-                        .toString()
-                        .replace(/&/g, "&amp;")
-                        .replace(/</g, "&lt;")
-                        .replace(/>/g, "&gt;")
-                        .replace(/"/g, "&quot;")
-                        .replace(/'/g, "&#x27;")
-                        .replace(/\//g, "&#x2F;");
+                    /*do nothing */
                 }
+            }
+            try {
+                return apex.util.escapeHTML(String(str));
+            } catch (e) {
+                str = String(str);
+                return str
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#x27;")
+                    .replace(/\//g, "&#x2F;");
             }
         },
         loader: {
