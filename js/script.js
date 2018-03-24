@@ -1,6 +1,6 @@
 var materialCards = (function () {
     "use strict";
-    var scriptVersion = "1.2.3";
+    var scriptVersion = "1.2.3.1";
     var util = {
         version: "1.0",
         escapeHTML: function (str) {
@@ -84,6 +84,21 @@ var materialCards = (function () {
                 console.log(finalConfig);
             }
             return finalConfig;
+        },
+        noDataMessage: {
+            show: function (id, text) {
+                var span = $("<span></span>");
+                span
+                    .addClass("nodatafound")
+                    .text(text)
+                    .css("display", "block")
+                    .css("padding", "12px")
+                    .css("font-size", "11px");
+                $(id).append(span);
+            },
+            hide: function (id, text) {
+                $(id).children('.nodatafound').remove();
+            }
         }
     };
 
@@ -152,7 +167,7 @@ var materialCards = (function () {
                     drawCards(row, cardDataJSON.row, configJSON);
                 } else {
                     container.css("min-height", "");
-                    row.append('<div class="s-g-col-12">' + noDataFoundMessage + '</div>');
+                    util.noDataMessage.show(row, noDataFoundMessage);
                 }
             }
 
@@ -200,7 +215,7 @@ var materialCards = (function () {
                             error: function (d) {
                                 container.empty();
                                 console.log(d.responseText);
-                                container.append("<span>Error occured please check console for more information</span>");
+                                //container.append("<span>Error occured please check console for more information</span>");
                             },
                             dataType: "json"
                         });
