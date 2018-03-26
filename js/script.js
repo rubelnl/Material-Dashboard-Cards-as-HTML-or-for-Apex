@@ -87,17 +87,39 @@ var materialCards = (function () {
         },
         noDataMessage: {
             show: function (id, text) {
-                var span = $("<span></span>");
-                span
-                    .addClass("nodatafound")
+                var div = $("<div></div>")
+                    .css("margin", "12px")
+                    .css("text-align", "center")
+                    .css("padding", "64px 0");
+
+                var subDiv = $("<div></div>");
+
+                var subDivSpan = $("<span></span>")
+                    .addClass("fa")
+                    .addClass("fa-search")
+                    .addClass("fa-2x")
+                    .css("height", "32px")
+                    .css("width", "32px")
+                    .css("color", "#D0D0D0")
+                    .css("margin-bottom", "16px");
+
+                subDiv.append(subDivSpan);
+
+                var span = $("<span></span>")
+                    .addClass("nodatafoundmessage")
                     .text(text)
                     .css("display", "block")
-                    .css("padding", "12px")
-                    .css("font-size", "11px");
-                $(id).append(span);
+                    .css("color", "#707070")
+                    .css("font-size", "12px");
+
+                div
+                    .append(subDiv)
+                    .append(span);
+
+                $(id).append(div);
             },
-            hide: function (id, text) {
-                $(id).children('.nodatafound').remove();
+            hide: function (id) {
+                $(id).children('.nodatafoundmessage').remove();
             }
         }
     };
